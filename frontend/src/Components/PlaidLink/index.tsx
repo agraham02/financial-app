@@ -4,6 +4,8 @@
 import React, { useEffect, useState } from "react";
 import { usePlaidLink } from "react-plaid-link";
 import { API_ENDPOINT } from "../../utils";
+import { useAppDispatch } from "../../app/hooks";
+import { setLinkSuccessful } from "../../features/auth/authSlice";
 
 export default function InitializeLink() {
     const [linkToken, setLinkToken] = useState(null);
@@ -35,6 +37,7 @@ interface LinkProps {
 }
 
 const Link: React.FC<LinkProps> = (props: LinkProps) => {
+    const dispatch = useAppDispatch();
     const onSuccess = React.useCallback(async (public_token, metadata) => {
         // send public_token to server
         const response = await fetch(
@@ -49,7 +52,7 @@ const Link: React.FC<LinkProps> = (props: LinkProps) => {
         );
         const responseJson = await response.json();
         console.log(responseJson);
-
+        dispatch(setLinkSuccessful(true));
         // Handle response ...
         //TODO: save data locally
     }, []);
