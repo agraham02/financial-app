@@ -7,6 +7,7 @@ const moment = require("moment");
 const cors = require("cors");
 const plaidAPIRouter = require("./routes/plaidAPI");
 const authenticationRouter = require("./routes/auth");
+const accountRouter = require("./routes/account");
 
 const PORT = process.env.PORT || 3001;
 
@@ -19,7 +20,22 @@ app.use(
 app.use(bodyParser.json());
 app.use(cors());
 
+const session = require("express-session");
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: false,
+        cookie: { secure: false },
+    })
+);
+
 require("./configs/dbConfig");
+
+const passport = require("passport");
+require("./configs/passportConfig");
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get("/", (req, res) => {
     res.send("Hello World!");
@@ -27,6 +43,7 @@ app.get("/", (req, res) => {
 
 app.use("/plaid", plaidAPIRouter);
 app.use("/auth", authenticationRouter);
+app.use("/account", accountRouter);
 
 app.listen(PORT || 3001, () => {
     console.log(`App listening on port ${PORT}`);
