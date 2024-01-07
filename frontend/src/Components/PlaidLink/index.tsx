@@ -3,7 +3,7 @@
 // obtain a link token to be used in the Link component
 import React, { useEffect, useState } from "react";
 import { usePlaidLink } from "react-plaid-link";
-import { API_ENDPOINT } from "../utils";
+import { API_ENDPOINT } from "../../utils";
 
 export default function InitializeLink() {
     const [linkToken, setLinkToken] = useState(null);
@@ -35,18 +35,21 @@ interface LinkProps {
 }
 
 const Link: React.FC<LinkProps> = (props: LinkProps) => {
-    const onSuccess = React.useCallback( async (public_token, metadata) => {
+    const onSuccess = React.useCallback(async (public_token, metadata) => {
         // send public_token to server
-        const response = await fetch(`${API_ENDPOINT}/plaid/exchange_public_token`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ public_token }),
-        });
+        const response = await fetch(
+            `${API_ENDPOINT}/plaid/exchange_public_token`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ public_token }),
+            }
+        );
         const responseJson = await response.json();
         console.log(responseJson);
-        
+
         // Handle response ...
         //TODO: save data locally
     }, []);
