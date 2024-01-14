@@ -17,7 +17,7 @@ export default function Login() {
             password,
         });
         console.log(response.data);
-        const userId = response.data.login.id;
+        const userId = response.data.authenticated._id;
         console.log(userId);
         dispatch(setUserId(userId));
         localStorage.setItem("userId", userId);

@@ -3,23 +3,27 @@
 // obtain a link token to be used in the Link component
 import React, { useEffect, useState } from "react";
 import { usePlaidLink } from "react-plaid-link";
-import { API_ENDPOINT } from "../../utils";
+import { API_ENDPOINT, postRequest } from "../../utils";
 import { useAppDispatch } from "../../app/hooks";
-import { setLinkSuccessful } from "../../features/auth/authSlice";
+import { setLinkSuccessful, setUserId } from "../../features/auth/authSlice";
 
 export default function InitializeLink() {
     const [linkToken, setLinkToken] = useState(null);
+    const dispatch = useAppDispatch();
 
     async function generateToken() {
-        const response = await fetch(
-            `${API_ENDPOINT}/plaid/create-link-token`,
-            {
-                method: "POST",
+        try {
+            const results = await postRequest("/plaid/create-link-token", {});
+            // console.log(response);
+            // console.log(results);
+            setLinkToken(results.data.link_token);
+        } catch (error) {
+            console.log(error);
+            if (error.response.data.needToLogin) {
+                localStorage.removeItem("userId");
+                dispatch(setUserId(""));
             }
-        );
-        const data = await response.json();
-
-        setLinkToken(data.link_token);
+        }
     }
 
     useEffect(() => {
@@ -39,22 +43,14 @@ interface LinkProps {
 const Link: React.FC<LinkProps> = (props: LinkProps) => {
     const dispatch = useAppDispatch();
     const onSuccess = React.useCallback(async (public_token, metadata) => {
+        console.log("i ran");
+        
         // send public_token to server
-        const response = await fetch(
-            `${API_ENDPOINT}/plaid/exchange_public_token`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ public_token }),
-            }
-        );
-        const responseJson = await response.json();
-        console.log(responseJson);
-        dispatch(setLinkSuccessful(true));
+        const results = await postRequest("/plaid/exchange_public_token", {
+            public_token,
+        });
+        console.log(results);
         // Handle response ...
-        //TODO: save data locally
     }, []);
 
     const config: Parameters<typeof usePlaidLink>[0] = {
