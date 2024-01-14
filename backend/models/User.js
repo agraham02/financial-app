@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
-
-const plaidDataSchema = new Schema({
-    accessToken: { type: String },
-    itemID: { type: String },
-});
+const plaidItemSchema = require("./PlaidItemSchema");
 
 const userSchema = new Schema({
     username: { type: String, required: true },
     password: { type: String, required: true },
-    plaidData: { type: plaidDataSchema, required: true },
+    plaidItems: {
+        type: [plaidItemSchema],
+        required: true,
+        default: [],
+    },
     createdAt: {
         type: Date,
         default: () => Date.now(),
