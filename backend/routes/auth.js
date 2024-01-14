@@ -9,8 +9,6 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
 
 router.post("/register", async (req, res, next) => {
     const { username, password } = req.body;
-    console.log(username);
-    console.log(password);
 
     try {
         if (await User.findOne({ username: username })) {
@@ -21,7 +19,14 @@ router.post("/register", async (req, res, next) => {
             password,
             plaidData: { accessToken: null, itemId: null },
         });
-        res.json({ register: newUser });
+
+        req.login(newUser, function (err) {
+            if (err) {
+                return next(err);
+            }
+            return res.json({ register: newUser });
+        });
+            // return res.json({ register: newUser });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }

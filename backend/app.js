@@ -18,7 +18,12 @@ app.use(
     })
 );
 app.use(bodyParser.json());
-app.use(cors());
+app.use(
+    cors({
+        origin: "http://localhost:5173",
+        credentials: true,
+    })
+);
 
 const session = require("express-session");
 app.use(
