@@ -9,6 +9,7 @@ import Transactions from "./Components/Transactions";
 import InitializeLink from "./Components/PlaidLink";
 import { getRequest } from "./utils";
 import Header from "./Components/Header";
+import Home from "./features/home";
 
 export default function FinanceApp() {
     const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +37,7 @@ export default function FinanceApp() {
     return (
         <>
             <Header />
-            {isLinkSuccessful ? <Transactions /> : <InitializeLink />}
+            {isLinkSuccessful ? <Home /> : <InitializeLink />}
             {/* <InitializeLink /> */}
         </>
     );

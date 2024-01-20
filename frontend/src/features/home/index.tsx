@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { formatMoney, getRequest } from "../../utils";
 
-export default function Transactions() {
+export default function Home() {
     const [accountData, setAccountData] = useState([]);
     const [cash, setCash] = useState(0);
     const [savings, setSavings] = useState(0);
     const [investments, setInvestments] = useState(0);
+    const [creditCards, setCreditCards] = useState(0);
+    const [loans, setLoans] = useState(0);
     const [debt, setDebt] = useState(0);
+
     const [assets, setAssets] = useState(0);
     const [liabilities, setLiabilities] = useState(0);
 
@@ -22,11 +25,13 @@ export default function Transactions() {
         const SAVINGS = "savings";
         const INVESMENTS = "investments";
         const CREDIT_CARD = "credit card";
+        const LOANS = "loans";
 
         let newCash = 0;
         let newSavings = 0;
         let newInvestments = 0;
-        let newDebt = 0;
+        let newCreditCard = 0;
+        let newLoans = 0;
         for (const account of accountData) {
             switch (account.subtype) {
                 case CHECKING:
@@ -39,7 +44,10 @@ export default function Transactions() {
                     newInvestments += account.balances.available;
                     break;
                 case CREDIT_CARD:
-                    newDebt += account.balances.current;
+                    newCreditCard += account.balances.current;
+                    break;
+                case LOANS:
+                    newCreditCard += account.balances.current;
                     break;
             }
         }
@@ -47,9 +55,11 @@ export default function Transactions() {
         setCash(newCash);
         setSavings(newSavings);
         setInvestments(newInvestments);
-        setDebt(newDebt);
+        setCreditCards(newCreditCard);
+        setLoans(newLoans);
+
         setAssets(newCash + newSavings + newInvestments);
-        setLiabilities(newDebt);
+        setLiabilities(newCreditCard + newLoans);
     }
 
     useEffect(() => {
@@ -67,7 +77,10 @@ export default function Transactions() {
                 <div>Cash: {formatMoney(cash)}</div>
                 <div>Savings: {formatMoney(savings)}</div>
                 <div>Investments: {formatMoney(investments)}</div>
-                <div>Debt: {formatMoney(debt)}</div>
+
+                <div>Credit Cards: {formatMoney(creditCards)}</div>
+                <div>Loans: {formatMoney(loans)}</div>
+
                 <div>Assets: {formatMoney(assets)}</div>
                 <div>Liabilities: {formatMoney(liabilities)}</div>
                 <div>Net worth: {formatMoney(assets - liabilities)}</div>
@@ -85,8 +98,12 @@ function AccountCard({ accountData }) {
             <div>
                 {accountData.name} {accountData.subtype}
             </div>
-            <div>Available Balance: {formatMoney(accountData.balances.available)}</div>
-            <div>Current Balance: {formatMoney(accountData.balances.current)}</div>
+            <div>
+                Available Balance: {formatMoney(accountData.balances.available)}
+            </div>
+            <div>
+                Current Balance: {formatMoney(accountData.balances.current)}
+            </div>
         </div>
     );
 }
