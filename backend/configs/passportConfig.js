@@ -29,7 +29,7 @@ async function initializeLocalStategy(username, password, done) {
         } else {
             const errorMessage = `Password does not match stored password`;
             console.log(errorMessage);
-            return cb(null, false, {
+            return done(null, false, {
                 message: errorMessage,
             });
         }
