@@ -3,7 +3,7 @@
 // obtain a link token to be used in the Link component
 import React, { useEffect, useState } from "react";
 import { usePlaidLink } from "react-plaid-link";
-import { API_ENDPOINT, postRequest } from "../../utils";
+import { API_ENDPOINT, getRequest, postRequest } from "../../utils";
 import { useAppDispatch } from "../../app/hooks";
 import { setLinkSuccessful, setUserId } from "../../features/auth/authSlice";
 
@@ -43,11 +43,12 @@ interface LinkProps {
 const Link: React.FC<LinkProps> = (props: LinkProps) => {
     const dispatch = useAppDispatch();
     const onSuccess = React.useCallback(async (public_token, metadata) => {
-        console.log("i ran");
-        
         // send public_token to server
+        console.log(metadata);
+        const { institution_id } = metadata.institution;
         const results = await postRequest("/plaid/exchange_public_token", {
             public_token,
+            institution_id,
         });
         console.log(results);
         // Handle response ...
@@ -61,8 +62,18 @@ const Link: React.FC<LinkProps> = (props: LinkProps) => {
     const { open, ready } = usePlaidLink(config);
 
     return (
-        <button onClick={() => open()} disabled={!ready}>
-            Link account
-        </button>
+        <div className="grow flex flex-col justify-center items-center">
+            <div>
+                Connect to at least one of your financial institutions to
+                continue
+            </div>
+            <button
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                onClick={() => open()}
+                disabled={!ready}
+            >
+                Link account
+            </button>
+        </div>
     );
 };
