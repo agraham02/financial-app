@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 finance-app.zip
+
+# Contentlayer
+.contentlayer
