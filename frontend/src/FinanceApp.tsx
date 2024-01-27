@@ -5,40 +5,36 @@ import {
     setLinkSuccessful,
     setUserId,
 } from "./features/auth/authSlice";
-import Transactions from "./Components/Transactions";
 import InitializeLink from "./Components/PlaidLink";
 import { getRequest } from "./utils";
-import Header from "./Components/Header";
+import Nav from "./Components/Nav";
 import Home from "./features/home";
+import Footer from "./Components/Footer";
+import { selectPlaidItemIds, setPlaidItems } from "./features/plaid/plaidSlice";
 
 export default function FinanceApp() {
     const [isLoading, setIsLoading] = useState(true);
+    const plaidItemsIds = useAppSelector(selectPlaidItemIds);
+    
     const dispatch = useAppDispatch();
-    const isLinkSuccessful = useAppSelector(selectIsLinkSuccessful);
 
-    async function checkPlaidAccessTokens() {
-        try {
-            const results = await getRequest("/account");
-            console.log(results);
-            dispatch(setLinkSuccessful(results.data.plaidItems.length > 0));
-        } catch (error) {
-            if (error.response.data.needToLogin) {
-                localStorage.removeItem("userId");
-                dispatch(setUserId(""));
-            }
-            console.log(error);
-        }
+    async function getUserPlaidItemsIds() {
+        const response = await getRequest("/account/item-ids");
+        const plaidItems = response.data;
+        console.log(plaidItems);
+        dispatch(setPlaidItems(plaidItems));
     }
 
     useEffect(() => {
-        checkPlaidAccessTokens();
+        getUserPlaidItemsIds();
     }, []);
 
     return (
-        <>
-            <Header />
-            {isLinkSuccessful ? <Home /> : <InitializeLink />}
+        <div className="w-full h-full flex flex-col">
+            <Nav />
+            {plaidItemsIds ? <Home /> : <InitializeLink />}
             {/* <InitializeLink /> */}
-        </>
+            <Footer />
+        </div>
     );
 }
